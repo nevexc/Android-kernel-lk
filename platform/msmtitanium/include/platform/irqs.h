@@ -44,14 +44,14 @@
 
 #define INT_QTMR_FRM_0_PHYSICAL_TIMER_EXP      (GIC_SPI_START + 257)
 
-#define USB30_EE1_IRQ                          (GIC_SPI_START + 134)
+#define USB30_EE1_IRQ                          (GIC_SPI_START + 140)
 #define USB1_HS_BAM_IRQ                        (GIC_SPI_START + 135)
 #define USB1_HS_IRQ                            (GIC_SPI_START + 134)
 #define SDCC1_PWRCTL_IRQ                       (GIC_SPI_START + 138)
 #define SDCC2_PWRCTL_IRQ                       (GIC_SPI_START + 221)
 
 /* Retrofit universal macro names */
-#define INT_USB_HS                             USB1_HS_IRQ
+#define INT_USB_HS                             USB30_EE1_IRQ
 
 #define EE0_KRAIT_HLOS_SPMI_PERIPH_IRQ         (GIC_SPI_START + 190)
 
