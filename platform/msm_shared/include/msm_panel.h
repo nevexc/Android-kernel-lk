@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2015, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2012-2016, The Linux Foundation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -373,6 +373,7 @@ struct labibb_desc {
 	char pwr_up_delay; /* ndx to => 1250, 2500, 5000 and 10000 us */
 	char pwr_down_delay; /* ndx to => 1250, 2500, 5000 and 10000 us */
 	char ibb_discharge_en;
+	bool swire_control;
 };
 
 struct msm_panel_info {
@@ -419,6 +420,9 @@ struct msm_panel_info {
 	int (*early_config) (void *pdata);
 	int (*config) (void *pdata);
 	int (*rotate) (void);
+
+	char autorefresh_enable;
+	uint32_t autorefresh_framenum;
 };
 
 struct msm_fb_panel_data {
