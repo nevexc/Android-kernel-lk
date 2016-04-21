@@ -59,6 +59,7 @@
 #include "include/panel_r69006_1080p_cmd.h"
 #include "include/panel_r69006_1080p_video.h"
 #include "include/panel_hx8394f_720p_video.h"
+#include "include/panel_nt51021b_1200p_video.h"
 #include "include/panel_truly_720p_video.h"
 #include "include/panel_truly_wuxga_video.h"
 #include "include/panel_truly_720p_cmd.h"
@@ -67,6 +68,7 @@
 /* static panel selection variable                                           */
 /*---------------------------------------------------------------------------*/
 enum {
+    NT51021B_1200P_VIDEO_PANEL,
 	TRULY_1080P_VIDEO_PANEL,
 	TRULY_1080P_CMD_PANEL,
 	OTM1906C_1080P_CMD_PANEL,
@@ -96,6 +98,7 @@ uint32_t panel_regulator_settings[] = {
  * Any panel in this list can be selected using fastboot oem command.
  */
 static struct panel_list supp_panels[] = {
+    {"nt51021b_1200p_video",NT51021B_1200P_VIDEO_PANEL},
 	{"truly_1080p_video", TRULY_1080P_VIDEO_PANEL},
 	{"truly_1080p_cmd", TRULY_1080P_CMD_PANEL},
 	{"sharp_1080p_cmd", SHARP_1080P_CMD_PANEL},
@@ -159,6 +162,33 @@ static int init_panel_data(struct panel_struct *panelstruct,
 	struct oem_panel_data *oem_data = mdss_dsi_get_oem_data_ptr();
 
 	switch (panel_id) {
+	case NT51021B_1200P_VIDEO_PANEL:
+		panelstruct->paneldata    = &nt51021b_1200p_video_panel_data;
+		panelstruct->panelres     = &nt51021b_1200p_video_panel_res;
+		panelstruct->color        = &nt51021b_1200p_video_color;
+		panelstruct->videopanel   = &nt51021b_1200p_video_video_panel;
+		panelstruct->commandpanel = &nt51021b_1200p_video_command_panel;
+		panelstruct->state        = &nt51021b_1200p_video_state;
+		panelstruct->laneconfig   = &nt51021b_1200p_video_lane_config;
+		panelstruct->paneltiminginfo
+					= &nt51021b_1200p_video_timing_info;
+		panelstruct->panelresetseq
+					= &nt51021b_1200p_video_panel_reset_seq;
+		panelstruct->backlightinfo
+					= &nt51021b_1200p_video_backlight;
+		pinfo->mipi.panel_on_cmds
+					= nt51021b_1200p_video_on_command;
+		pinfo->mipi.num_of_panel_on_cmds
+					= NT5021B_1200P_VIDEO_ON_COMMAND;
+		pinfo->mipi.panel_off_cmds
+					= nt51021b_1200p_video_off_command;
+		pinfo->mipi.num_of_panel_off_cmds
+					= NT51021B_1200PVIDEO_OFF_COMMAND;
+		memcpy(phy_db->timing,
+				nt51021b_1200p_video_timings, TIMING_SIZE);
+		pinfo->mipi.signature = NT51021B_1200P_VIDEO_SIGNATURE;
+		phy_db->regulator_mode = DSI_PHY_REGULATOR_LDO_MODE;
+		break;
 	case TRULY_1080P_VIDEO_PANEL:
 		panelstruct->paneldata    = &truly_1080p_video_panel_data;
 		panelstruct->paneldata->panel_with_enable_gpio = 1;
@@ -708,6 +738,10 @@ uint32_t oem_panel_max_auto_detect_panels()
 		DISPLAY_MAX_PANEL_DETECTION : 0;
 }
 
+uint32_t oem_get_panel_id() {
+    return NT51021B_1200P_VIDEO_PANEL;
+}
+
 int oem_panel_select(const char *panel_name, struct panel_struct *panelstruct,
 			struct msm_panel_info *pinfo,
 			struct mdss_dsi_phy_ctrl *phy_db)
@@ -716,6 +750,11 @@ int oem_panel_select(const char *panel_name, struct panel_struct *panelstruct,
 	uint32_t hw_subtype = board_hardware_subtype();
 	int32_t panel_override_id;
 	uint32_t target_id, plat_hw_ver_major;
+
+#if 1
+  panel_id = oem_get_panel_id();
+  goto panel_init;
+#endif
 
 	if (panel_name) {
 		panel_override_id = panel_name_to_id(supp_panels,

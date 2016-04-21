@@ -69,7 +69,9 @@ static struct gpio_pin bkl_gpio = {
 static struct gpio_pin lcd_mode_gpio = {
   "msmgpio", 107, 3, 1, 0, 1
 };
-
+static struct gpio_pin lcd_power_3v3_gpio = {
+  "msmgpio", 44, 3, 1, 0, 1
+};
 #define VCO_DELAY_USEC 1000
 #define GPIO_STATE_LOW 0
 #define GPIO_STATE_HIGH 2
@@ -382,6 +384,10 @@ int target_panel_reset(uint8_t enable, struct panel_reset_sequence *resetseq,
 	}
 
 	if (enable) {
+		gpio_tlmm_config(lcd_power_3v3_gpio.pin_id, 0,
+		lcd_power_3v3_gpio.pin_direction, lcd_power_3v3_gpio.pin_pull,
+		lcd_power_3v3_gpio.pin_strength, lcd_power_3v3_gpio.pin_state);
+		gpio_set_dir(lcd_power_3v3_gpio.pin_id, GPIO_STATE_HIGH);
 		if (pinfo->mipi.use_enable_gpio && !platform_is_msm8956()) {
 			gpio_tlmm_config(enable_gpio.pin_id, 0,
 				enable_gpio.pin_direction, enable_gpio.pin_pull,
@@ -428,6 +434,7 @@ int target_panel_reset(uint8_t enable, struct panel_reset_sequence *resetseq,
 			gpio_set_dir(enable_gpio.pin_id, 0);
 		if (platform_is_msm8956())
 			gpio_set_dir(lcd_mode_gpio.pin_id, 0);
+			gpio_set_dir(lcd_power_3v3_gpio.pin_id, GPIO_STATE_LOW);
 	}
 
 	return ret;
